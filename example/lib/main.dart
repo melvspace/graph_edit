@@ -1,0 +1,56 @@
+import 'package:example/versions/graph_v1_page.dart';
+import 'package:example/versions/random_graph_page.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+void main() {
+  runApp(const MainApp());
+}
+
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  late final GoRouter router;
+
+  @override
+  void initState() {
+    router = GoRouter(
+      initialLocation: '/v2',
+      routes: [
+        GoRoute(path: '/v1', builder: (context, state) => GraphV1Page()),
+        GoRoute(path: '/v2', builder: (context, state) => RandomGraphPage()),
+      ],
+    );
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Provider<Drawer>(
+      create: (context) => Drawer(
+        child: Column(
+          children: [
+            ListTile(
+              title: Text('V1'),
+              onTap: () => router.go('/v1'),
+            ),
+            ListTile(
+              title: Text('V2'),
+              onTap: () => router.go('/v2'),
+            ),
+          ],
+        ),
+      ),
+      child: MaterialApp.router(
+        routerConfig: router,
+      ),
+    );
+  }
+}
