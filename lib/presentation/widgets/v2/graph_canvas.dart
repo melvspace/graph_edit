@@ -4,9 +4,11 @@ import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:graph_edit/graph_edit.dart';
+import 'package:graph_edit/presentation/curves/connection_curve.dart';
+import 'package:graph_edit/presentation/widgets/graph_node_port_widget.dart';
 import 'package:graph_edit/presentation/widgets/graph_node_widget.dart';
+import 'package:vector_math/vector_math_64.dart' show Vector3;
 
 class GraphCanvasController extends ChangeNotifier {
   Offset _position = Offset.zero;
@@ -26,7 +28,7 @@ class GraphCanvasController extends ChangeNotifier {
   }
 }
 
-typedef NodeWidgetBuilder = Widget Function(Node node);
+typedef NodeWidgetBuilder = Widget Function(Node node, bool selected);
 typedef NodeDragCallback = void Function(
   String id,
   Offset position,
@@ -34,6 +36,7 @@ typedef NodeDragCallback = void Function(
 );
 
 class GraphCanvas extends StatefulWidget {
+  final String? selected;
   final List<Node> nodes;
   final List<Connection> connections;
 
@@ -44,6 +47,7 @@ class GraphCanvas extends StatefulWidget {
     super.key,
     required this.nodes,
     required this.connections,
+    this.selected,
     this.nodeBuilder,
     this.onNodeDragged,
   });
@@ -79,7 +83,11 @@ class _GraphCanvasState extends State<GraphCanvas> {
     for (final node in widget.nodes) {
       maxZIndex = max(maxZIndex, node.zIndex);
 
-      if (_nodes[node.id] == node) {
+      var changed = node.id == oldWidget.selected ||
+          node.id == widget.selected ||
+          _nodes[node.id] != node;
+
+      if (!changed) {
         continue;
       }
 
@@ -118,7 +126,10 @@ class _GraphCanvasState extends State<GraphCanvas> {
           );
         },
         child: RepaintBoundary(
-          child: widget.nodeBuilder?.call(node) ?? //
+          child: widget.nodeBuilder?.call(
+                node,
+                widget.selected == node.id,
+              ) ??
               GraphNodeWidget(node: node),
         ),
       ),
@@ -133,38 +144,41 @@ class _GraphCanvasState extends State<GraphCanvas> {
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerSignal: (event) {
-        if (event is PointerScrollEvent) {
-          var direction = event.scrollDelta.dy < 0;
-          double oldScale = controller.scale;
-          double newScale = oldScale * (direction ? 1.1 : 0.9);
-          newScale = newScale.clamp(0.5, 2.0);
-          double scaleRatio = newScale / oldScale;
+    return ClipRect(
+      child: Listener(
+        onPointerSignal: (event) {
+          if (event is PointerScrollEvent) {
+            var direction = event.scrollDelta.dy < 0;
+            double oldScale = controller.scale;
+            double newScale = oldScale * (direction ? 1.1 : 0.9);
+            newScale = newScale.clamp(0.5, 2.0);
+            double scaleRatio = newScale / oldScale;
 
-          // Zoom towards cursor position
-          controller.position = event.position +
-              (controller.position - event.position) * scaleRatio;
-          controller.scale = newScale;
-        }
-      },
-      child: GestureDetector(
-        onScaleUpdate: (details) {
-          controller.position += details.focalPointDelta;
-          controller.scale *= details.scale;
+            // Zoom towards cursor position
+            controller.position = event.position +
+                (controller.position - event.position) * scaleRatio;
+            controller.scale = newScale;
+          }
         },
-        child: RepaintBoundary(
-          child: GraphCanvasInternal(
-            controller: controller,
-            children: _children.entries
-                .sortedBy<num>(
-                  (element) =>
-                      _zIndexChangeHolder[element.key] ??
-                      _nodes[element.key]?.zIndex ??
-                      0,
-                )
-                .map((e) => e.value)
-                .toList(),
+        child: GestureDetector(
+          onScaleUpdate: (details) {
+            controller.position += details.focalPointDelta;
+            controller.scale *= details.scale;
+          },
+          child: RepaintBoundary(
+            child: GraphCanvasInternal(
+              controller: controller,
+              connections: widget.connections,
+              children: _children.entries
+                  .sortedBy<num>(
+                    (element) =>
+                        _zIndexChangeHolder[element.key] ??
+                        _nodes[element.key]?.zIndex ??
+                        0,
+                  )
+                  .map((e) => e.value)
+                  .toList(),
+            ),
           ),
         ),
       ),
@@ -174,11 +188,13 @@ class _GraphCanvasState extends State<GraphCanvas> {
 
 class GraphCanvasInternal extends MultiChildRenderObjectWidget {
   final GraphCanvasController controller;
+  final List<Connection> connections;
 
   const GraphCanvasInternal({
     super.key,
     super.children,
     required this.controller,
+    required this.connections,
   });
 
   @override
@@ -193,6 +209,7 @@ class GraphCanvasInternal extends MultiChildRenderObjectWidget {
   ) {
     renderObject.panOffset = controller.position;
     renderObject.scale = controller.scale;
+    renderObject.connections = connections;
 
     super.updateRenderObject(
       context,
@@ -204,7 +221,8 @@ class GraphCanvasInternal extends MultiChildRenderObjectWidget {
   RenderObject createRenderObject(BuildContext context) {
     return GraphCanvasInternalRenderObject()
       ..panOffset = controller.position
-      ..scale = controller.scale;
+      ..scale = controller.scale
+      ..connections = connections;
   }
 }
 
@@ -221,6 +239,7 @@ class GraphCanvasInternalElement extends MultiChildRenderObjectElement {
   void updateRenderObject() {
     renderObject.panOffset = widget.controller.position;
     renderObject.scale = widget.controller.scale;
+    renderObject.connections = widget.connections;
   }
 
   @override
@@ -242,9 +261,14 @@ class GraphCanvasInternalRenderObject extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, StackParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, StackParentData> {
+  List<Connection> connections = [];
+
   // Transform state
   Offset _panOffset = Offset.zero;
   double _scale = 1.0;
+
+  Map<String, Offset> portPositionCache = {};
+  Map<String, (Offset, GraphNodePortViewModel, RenderBox)> portCache = {};
 
   Rect get viewBounds {
     return -(_panOffset / _scale) & (size / _scale);
@@ -286,6 +310,28 @@ class GraphCanvasInternalRenderObject extends RenderBox
     while (child != null) {
       final childParentData = child.parentData! as StackParentData;
       child.layout(const BoxConstraints(), parentUsesSize: true);
+
+      final childOffset = Offset(
+        childParentData.left ?? 0,
+        childParentData.top ?? 0,
+      );
+
+      void visitor(RenderObject renderObject) {
+        if (renderObject is RenderMetaData) {
+          final meta = renderObject.metaData;
+          if (meta case GraphNodePortViewModel viewModel) {
+            portCache[viewModel.port.id] = (
+              childOffset,
+              viewModel,
+              renderObject,
+            );
+          }
+        }
+
+        renderObject.visitChildren(visitor);
+      }
+
+      visitor(child);
       child = childParentData.nextSibling;
     }
   }
@@ -341,6 +387,11 @@ class GraphCanvasInternalRenderObject extends RenderBox
     // Background
     paintBackground(context, offset);
 
+    paintConnections(context, offset);
+    paintNodes(context, offset);
+  }
+
+  void paintNodes(PaintingContext context, Offset offset) {
     // Paint children
     RenderBox? child = firstChild;
     while (child != null) {
@@ -364,6 +415,49 @@ class GraphCanvasInternalRenderObject extends RenderBox
       }
 
       child = childParentData.nextSibling;
+    }
+  }
+
+  void paintConnections(PaintingContext context, Offset offset) {
+    for (final connection in connections) {
+      final startTuple = portCache[connection.outputId];
+      final endTuple = portCache[connection.inputId];
+
+      if (startTuple == null || endTuple == null) continue;
+
+      final startRO = startTuple.$3;
+      final endRO = endTuple.$3;
+
+      final startViewModel = startTuple.$2;
+      final endViewModel = endTuple.$2;
+
+      final startNodeOffset = startTuple.$1;
+      final endNodeOffset = endTuple.$1;
+
+      var start = startNodeOffset +
+          startRO.getTransformTo(this).getTranslation().toOffset() +
+          startRO.size.toOffset() / 2;
+      var end = endNodeOffset +
+          endRO.getTransformTo(this).getTranslation().toOffset() +
+          endRO.size.toOffset() / 2;
+
+      context.pushLayer(
+        TransformLayer(
+          offset: _panOffset,
+          transform: Matrix4.identity().scaled(_scale),
+        ),
+        (PaintingContext context, Offset offset) {
+          ConnectionCurve(
+            start: start + offset,
+            end: end + offset,
+            startDirection: startViewModel.direction,
+            endDirection: endViewModel.direction,
+            startColor: startViewModel.port.color ?? Colors.white,
+            endColor: endViewModel.port.color ?? Colors.white,
+          ).paint(context.canvas);
+        },
+        offset,
+      );
     }
   }
 
@@ -395,4 +489,29 @@ class GraphCanvasInternalRenderObject extends RenderBox
 
     return true;
   }
+}
+
+extension on Size {
+  Offset toOffset() {
+    return Offset(width, height);
+  }
+}
+
+extension on Vector3 {
+  Offset toOffset() {
+    return Offset(x, y);
+  }
+}
+
+Path cubic(List<Offset> controlPoints) {
+  return Path()
+    ..moveTo(controlPoints.first.dx, controlPoints.first.dy)
+    ..cubicTo(
+      controlPoints[1].dx,
+      controlPoints[1].dy,
+      controlPoints[2].dx,
+      controlPoints[2].dy,
+      controlPoints.last.dx,
+      controlPoints.last.dy,
+    );
 }

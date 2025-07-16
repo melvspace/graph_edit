@@ -1,3 +1,4 @@
+import 'package:example/versions/connections_page.dart';
 import 'package:example/versions/graph_v1_page.dart';
 import 'package:example/versions/random_graph_page.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,10 @@ class _MainAppState extends State<MainApp> {
       routes: [
         GoRoute(path: '/v1', builder: (context, state) => GraphV1Page()),
         GoRoute(path: '/v2', builder: (context, state) => RandomGraphPage()),
+        GoRoute(
+          path: '/connections',
+          builder: (context, state) => ConnectionsPage(),
+        ),
       ],
     );
 
@@ -45,11 +50,16 @@ class _MainAppState extends State<MainApp> {
               title: Text('V2'),
               onTap: () => router.go('/v2'),
             ),
+            ListTile(
+              title: Text('Connections'),
+              onTap: () => router.go('/connections'),
+            ),
           ],
         ),
       ),
       child: MaterialApp.router(
         routerConfig: router,
+        theme: ThemeData.dark(),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:example/versions/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:graph_edit/graph_edit.dart';
+import 'package:graph_edit/presentation/widgets/graph_node_widget.dart';
 import 'package:provider/provider.dart';
 
 class GraphV1Page extends StatelessWidget {
@@ -15,10 +16,11 @@ class GraphV1Page extends StatelessWidget {
         nodes: kNodes,
         connections: [
           Connection(
-            output: NodePort(label: 'Output', id: 'uuid4'),
-            input: NodePort(label: 'Input', id: 'uuid5'),
+            outputId: 'uuid4',
+            inputId: 'uuid5',
           ),
         ],
+        nodeBuilder: (context, node) => GraphNodeWidget(node: node),
       ),
     );
   }

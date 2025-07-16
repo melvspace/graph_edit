@@ -30,10 +30,13 @@ class GraphNodeCanvas extends StatefulWidget {
   final List<Node> nodes;
   final List<Connection> connections;
 
+  final Widget Function(BuildContext context, Node node)? nodeBuilder;
+
   const GraphNodeCanvas({
     super.key,
     required this.nodes,
     required this.connections,
+    this.nodeBuilder,
   });
 
   @override
@@ -128,13 +131,13 @@ class GraphNodeCanvasState extends State<GraphNodeCanvas> {
 }
 
 class Connection {
-  final NodePort output;
-  final NodePort input;
+  final String outputId;
+  final String inputId;
   final Color color;
 
   Connection({
-    required this.output,
-    required this.input,
+    required this.outputId,
+    required this.inputId,
     this.color = Colors.white,
   });
 }

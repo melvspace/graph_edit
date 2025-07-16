@@ -25,7 +25,7 @@ class NodeGraphState {
     return [
       "AABB: $aabb",
       "Nodes:\n\t${nodes.map((e) => e.id).join('\n\t')}",
-      "Connections:\n\t${connections.map((e) => "${e.output.id} -> ${e.input.id}").join('\n\t')}",
+      "Connections:\n\t${connections.map((e) => "${e.outputId} -> ${e.inputId}").join('\n\t')}",
     ].join('\n');
   }
 }
