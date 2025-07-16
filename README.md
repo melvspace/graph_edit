@@ -2,6 +2,8 @@
 
 A Flutter package for creating interactive node-based graph editors with infinite canvas and connection management.
 
+![Screenshot of graph_edit](https://github.com/melvspace/graph_edit/blob/main/docs/assets/screenshot.png?raw=true)
+
 ## Installation
 
 ```yaml
