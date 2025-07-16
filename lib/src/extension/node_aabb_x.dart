@@ -1,7 +1,7 @@
 // ignore_for_file: unused_element
 
 import 'package:flutter/widgets.dart';
-import 'package:graph_edit/domain/entity/node.dart';
+import 'package:graph_edit/src/domain/entity/node.dart';
 
 class NodeAABB {
   final Rect rect;

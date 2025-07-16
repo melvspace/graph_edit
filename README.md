@@ -1,39 +1,77 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# graph_edit
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+A Flutter package for creating interactive node-based graph editors with infinite canvas and connection management.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
+## Installation
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+```yaml
+dependencies:
+  graph_edit: ^0.1.0
+```
+
+## Basic Usage
+
+```dart
+import 'package:graph_edit/graph_edit.dart';
+
+GraphCanvas(
+  nodes: nodes,
+  selected: selectedNodeId,
+  onNodeDragged: (id, position, zIndex) => updateNode(id, position, zIndex),
+  connections: connections,
+  nodeBuilder: (node, isSelected) => buildNodeWidget(node, isSelected),
+)
+```
+
+## Core Classes
+
+### Node
+
+Represents a graph node with inputs and outputs.
+
+```dart
+Node(
+  id: 'node_id',
+  position: Offset(x, y),
+  title: 'Node Title',
+  inputs: [NodePort(id: 'in1', label: 'Input')],
+  outputs: [NodePort(id: 'out1', label: 'Output')],
+  zIndex: 0,
+)
+```
+
+### NodePort
+Defines connection points on nodes.
+
+```dart
+NodePort(
+  id: 'port_id',
+  label: 'Port Label',
+  color: Colors.blue, // optional
+)
+```
+
+### Connection
+Represents a connection between two ports.
+
+```dart
+Connection(
+  outputId: 'source_port_id',
+  inputId: 'target_port_id',
+)
+```
+
+## Components
+
+- **GraphCanvas**: Main widget for rendering the interactive graph with infinite canvas
+- **GraphNodeWidget**: Default node visualization widget. You can write your own widget to override the default behavior.
+- **Custom Node Widgets**: Create your own node layouts with automatic port detection
+- **Custom Port Widgets**: Design custom port appearance and behavior
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
-```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+- Interactive node editing with infinite canvas
+- Visual connections between node ports
+- Custom Node and Port widgets with automatic layout detection
+- Automatic connection curve positioning and routing
+- Z-index management for node layering

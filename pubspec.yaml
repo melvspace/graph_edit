@@ -1,6 +1,6 @@
 name: graph_edit
 description: "Graph Nodes Editor on canvas for Flutter. Inspired by Blender Geo Nodes and Godot Node Editor."
-version: 0.0.1
+version: 0.1.0
 
 environment:
   sdk: ^3.6.2
@@ -12,10 +12,11 @@ dependencies:
 
   equatable: ^2.0.0
   collection: ^1.0.0
+  vector_math: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^5.0.0
-
+  melos: ^6.0.0

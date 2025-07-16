@@ -4,18 +4,17 @@ import 'package:example/utility/run_mode.dart';
 import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:graph_edit/graph_edit.dart';
-import 'package:graph_edit/presentation/widgets/v2/graph_canvas.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-class RandomGraphPage extends StatefulWidget {
-  const RandomGraphPage({super.key});
+class CanvasPage extends StatefulWidget {
+  const CanvasPage({super.key});
 
   @override
-  State<RandomGraphPage> createState() => _RandomGraphPageState();
+  State<CanvasPage> createState() => _CanvasPageState();
 }
 
-class _RandomGraphPageState extends State<RandomGraphPage> {
+class _CanvasPageState extends State<CanvasPage> {
   int get count => switch (RunMode.current) {
     RunMode.release => 1000,
     RunMode.profile => 500,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graph_edit/domain/entity/node.dart';
-import 'package:graph_edit/presentation/widgets/graph_node_port_widget.dart';
+import 'package:graph_edit/src/domain/entity/node.dart';
+import 'package:graph_edit/src/presentation/widgets/graph_node_port_widget.dart';
 
 final kGraphNodeDecoration = BoxDecoration(
   color: Colors.grey[800],

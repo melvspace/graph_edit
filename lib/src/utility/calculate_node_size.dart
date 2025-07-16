@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:graph_edit/utility/widget_size_extractor.dart';
+import 'package:graph_edit/src/utility/widget_size_extractor.dart';
 
 /// Calculates the size of a given widget by temporarily inserting it into an overlay.
 ///

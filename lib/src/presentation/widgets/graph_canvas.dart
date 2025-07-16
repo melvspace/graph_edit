@@ -5,9 +5,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:graph_edit/graph_edit.dart';
-import 'package:graph_edit/presentation/curves/connection_curve.dart';
-import 'package:graph_edit/presentation/widgets/graph_node_port_widget.dart';
-import 'package:graph_edit/presentation/widgets/graph_node_widget.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
 class GraphCanvasController extends ChangeNotifier {

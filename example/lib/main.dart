@@ -1,6 +1,5 @@
+import 'package:example/versions/canvas_page.dart';
 import 'package:example/versions/connections_page.dart';
-import 'package:example/versions/graph_v1_page.dart';
-import 'package:example/versions/random_graph_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -22,10 +21,12 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     router = GoRouter(
-      initialLocation: '/v2',
+      initialLocation: '/canvas',
       routes: [
-        GoRoute(path: '/v1', builder: (context, state) => GraphV1Page()),
-        GoRoute(path: '/v2', builder: (context, state) => RandomGraphPage()),
+        GoRoute(
+          path: '/canvas',
+          builder: (context, state) => CanvasPage(),
+        ),
         GoRoute(
           path: '/connections',
           builder: (context, state) => ConnectionsPage(),

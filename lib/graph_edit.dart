@@ -1,8 +1,8 @@
 // Domain
-export 'domain/domain.dart';
+export 'src/domain/domain.dart';
 
 // Extension
-export 'extension/extension.dart';
+export 'src/extension/extension.dart';
 
 // Presentation
-export 'presentation/presentation.dart';
+export 'src/presentation/presentation.dart';

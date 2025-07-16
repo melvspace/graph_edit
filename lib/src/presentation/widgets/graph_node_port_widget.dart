@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:graph_edit/domain/entity/node_port.dart';
+import 'package:graph_edit/src/domain/entity/node_port.dart';
 
 class GraphNodePortViewModel extends ParentData {
   final NodePort port;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:graph_edit/domain/entity/node.dart';
+import 'package:graph_edit/graph_edit.dart';
 
 class NodeInspector extends StatefulWidget {
   final Node node;

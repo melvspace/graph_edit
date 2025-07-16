@@ -74,7 +74,8 @@ class ConnectionCurve {
       );
   }
 
-// Option 1: Proportional scaling with higher minimum
+  // Option 1: Proportional scaling with higher minimum
+  // ignore: non_constant_identifier_names
   Offset calculateControlPoints_v1(
     Offset start,
     Offset end,
@@ -86,7 +87,8 @@ class ConnectionCurve {
     return direction * controlDistance;
   }
 
-// Option 2: Distance-aware scaling (RECOMMENDED)
+  // Option 2: Distance-aware scaling
+  // ignore: non_constant_identifier_names
   Offset calculateControlPoints_v2(
     Offset start,
     Offset end,
@@ -103,7 +105,8 @@ class ConnectionCurve {
     return direction * controlDistance;
   }
 
-// Option 3: Hybrid approach with direction emphasis
+  // Option 3: Hybrid approach with direction emphasis
+  // ignore: non_constant_identifier_names
   Offset calculateControlPoints_v3(
     Offset start,
     Offset end,
@@ -122,7 +125,8 @@ class ConnectionCurve {
     return direction * controlDistance.clamp(120.0, 400.0);
   }
 
-// Option 4: Exponential scaling for very far nodes
+  // Option 4: Exponential scaling for very far nodes
+  // ignore: non_constant_identifier_names
   Offset calculateControlPoints_v4(
     Offset start,
     Offset end,
@@ -142,7 +146,8 @@ class ConnectionCurve {
     return direction * controlDistance;
   }
 
-// Option 5: Viewport-aware scaling (most sophisticated)
+  // Option 5: Viewport-aware scaling (most sophisticated)
+  // ignore: non_constant_identifier_names
   Offset calculateControlPoints_v5(Offset start, Offset end, Offset direction,
       double distance, double viewportScale) {
     // Take into account zoom level - closer zoom needs more pronounced curves
@@ -162,9 +167,5 @@ class ConnectionCurve {
 extension on Offset {
   Offset normalized() {
     return this / distance;
-  }
-
-  double dot(Offset other) {
-    return (dx * other.dx) + (dy * other.dy);
   }
 }

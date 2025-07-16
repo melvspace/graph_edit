@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:equatable/equatable.dart';
-import 'package:graph_edit/domain/entity/node_port.dart';
+import 'package:graph_edit/src/domain/entity/node_port.dart';
 
 class Node with EquatableMixin {
   final String id;

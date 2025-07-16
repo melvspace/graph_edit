@@ -1,10 +1,6 @@
 import 'package:example/widgets/node_inspector.dart';
 import 'package:flutter/material.dart';
-import 'package:graph_edit/domain/entity/node.dart';
-import 'package:graph_edit/domain/entity/node_port.dart';
-import 'package:graph_edit/presentation/widgets/graph_node_widget.dart';
-import 'package:graph_edit/presentation/widgets/v2/graph_canvas.dart';
-import 'package:graph_edit/presentation/widgets/widgets.dart';
+import 'package:graph_edit/graph_edit.dart';
 import 'package:provider/provider.dart';
 
 class ConnectionsPage extends StatefulWidget {
