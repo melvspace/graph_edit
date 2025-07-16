@@ -1,6 +1,8 @@
 name: graph_edit
-description: "Graph Nodes Editor on canvas for Flutter. Inspired by Blender Geo Nodes and Godot Node Editor."
 version: 0.1.0
+description: "Graph Nodes Editor on canvas for Flutter. Inspired by Blender Geo Nodes and Godot Node Editor."
+repository: https://github.com/melvspace/graph_edit
+issue_tracker: https://github.com/melvspace/graph_edit/issues
 
 environment:
   sdk: ^3.6.2
