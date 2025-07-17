@@ -48,17 +48,21 @@ class ConnectionCurve {
     final gradientBegin = Alignment(-direction.dx, -direction.dy);
     final gradientEnd = Alignment(direction.dx, direction.dy);
 
-    canvas.drawPath(
-      path,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = decoration.strokeWidth
-        ..shader = LinearGradient(
-          colors: [decoration.startColor, decoration.endColor],
-          begin: gradientBegin,
-          end: gradientEnd,
-        ).createShader(pathBounds),
-    );
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = decoration.strokeWidth;
+
+    if (decoration.startColor != decoration.endColor) {
+      paint.shader = LinearGradient(
+        colors: [decoration.startColor, decoration.endColor],
+        begin: gradientBegin,
+        end: gradientEnd,
+      ).createShader(pathBounds);
+    } else {
+      paint.color = decoration.startColor;
+    }
+
+    canvas.drawPath(path, paint);
   }
 
   Path cubic(List<Offset> controlPoints) {
