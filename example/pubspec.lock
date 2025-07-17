@@ -118,7 +118,7 @@ packages:
       path: "../packages/graph_edit"
       relative: true
     source: path
-    version: "0.1.2"
+    version: "0.1.2+1"
   leak_tracker:
     dependency: transitive
     description:

@@ -1,3 +1,4 @@
+import 'package:example/examples/item_builder/item_builder_page.dart';
 import 'package:example/versions/canvas_page.dart';
 import 'package:example/versions/connections_page.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,10 @@ class _MainAppState extends State<MainApp> {
           path: '/connections',
           builder: (context, state) => ConnectionsPage(),
         ),
+        GoRoute(
+          path: '/item-builder',
+          builder: (context, state) => ItemBuilderPage(),
+        ),
       ],
     );
 
@@ -44,16 +49,16 @@ class _MainAppState extends State<MainApp> {
         child: Column(
           children: [
             ListTile(
-              title: Text('V1'),
-              onTap: () => router.go('/v1'),
-            ),
-            ListTile(
               title: Text('V2'),
               onTap: () => router.go('/v2'),
             ),
             ListTile(
               title: Text('Connections'),
               onTap: () => router.go('/connections'),
+            ),
+            ListTile(
+              title: Text('Item Builder'),
+              onTap: () => router.go('/item-builder'),
             ),
           ],
         ),
