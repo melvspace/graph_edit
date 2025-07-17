@@ -1,0 +1,4 @@
+# melos_managed_dependency_overrides: graph_edit
+dependency_overrides:
+  graph_edit:
+    path: ../packages/graph_edit

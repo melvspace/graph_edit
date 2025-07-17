@@ -1,3 +1,4 @@
 name: graph_edit_workspace
 packages:
-- .
+- example
+- packages/*
