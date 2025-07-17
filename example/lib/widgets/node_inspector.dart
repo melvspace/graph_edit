@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:graph_edit/graph_edit.dart';
 
 class NodeInspector extends StatefulWidget {
-  final Node node;
-  final ValueChanged<Node>? onChanged;
+  final BasicNode node;
+  final ValueChanged<BasicNode>? onChanged;
 
   const NodeInspector({
     super.key,

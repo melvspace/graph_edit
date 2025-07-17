@@ -25,38 +25,49 @@ class GraphCanvasController extends ChangeNotifier {
   }
 }
 
-typedef NodeWidgetBuilder = Widget Function(Node node, bool selected);
+typedef NodeWidgetBuilder<TNode extends Node<TNodePort>,
+        TNodePort extends NodePort>
+    = Widget Function(
+  TNode node,
+  bool selected,
+);
+
 typedef NodeDragCallback = void Function(
   String id,
   Offset position,
   int zIndex,
 );
 
-class GraphCanvas extends StatefulWidget {
+class GraphCanvas<TNode extends Node<TNodePort>, TNodePort extends NodePort>
+    extends StatefulWidget {
   final String? selected;
-  final List<Node> nodes;
+  final List<TNode> nodes;
   final List<Connection> connections;
 
-  final NodeWidgetBuilder? nodeBuilder;
+  final NodeWidgetBuilder<TNode, TNodePort> nodeBuilder;
   final NodeDragCallback? onNodeDragged;
+
+  final ConnectionCurveTheme? connectionTheme;
 
   const GraphCanvas({
     super.key,
     required this.nodes,
     required this.connections,
+    required this.nodeBuilder,
     this.selected,
-    this.nodeBuilder,
     this.onNodeDragged,
+    this.connectionTheme,
   });
 
   @override
-  State<GraphCanvas> createState() => _GraphCanvasState();
+  State<GraphCanvas> createState() => _GraphCanvasState<TNode, TNodePort>();
 }
 
-class _GraphCanvasState extends State<GraphCanvas> {
+class _GraphCanvasState<TNode extends Node<TNodePort>,
+    TNodePort extends NodePort> extends State<GraphCanvas<TNode, TNodePort>> {
   final controller = GraphCanvasController();
 
-  final Map<String, Node> _nodes = {};
+  final Map<String, TNode> _nodes = {};
   final Map<String, Widget> _children = {};
   final Map<String, Offset> _offsetDeltaHolder = {};
   final Map<String, int> _zIndexChangeHolder = {};
@@ -75,7 +86,7 @@ class _GraphCanvasState extends State<GraphCanvas> {
   }
 
   @override
-  void didUpdateWidget(covariant GraphCanvas oldWidget) {
+  void didUpdateWidget(covariant GraphCanvas<TNode, TNodePort> oldWidget) {
     maxZIndex = 0;
     for (final node in widget.nodes) {
       maxZIndex = max(maxZIndex, node.zIndex);
@@ -97,7 +108,7 @@ class _GraphCanvasState extends State<GraphCanvas> {
     super.didUpdateWidget(oldWidget);
   }
 
-  Widget buildNode(Node node) {
+  Widget buildNode(TNode node) {
     return Positioned(
       key: Key(node.id),
       left: node.position.dx + (_offsetDeltaHolder[node.id]?.dx ?? 0),
@@ -123,11 +134,10 @@ class _GraphCanvasState extends State<GraphCanvas> {
           );
         },
         child: RepaintBoundary(
-          child: widget.nodeBuilder?.call(
-                node,
-                widget.selected == node.id,
-              ) ??
-              GraphNodeWidget(node: node),
+          child: widget.nodeBuilder.call(
+            node,
+            widget.selected == node.id,
+          ),
         ),
       ),
     );
@@ -166,6 +176,7 @@ class _GraphCanvasState extends State<GraphCanvas> {
             child: GraphCanvasInternal(
               controller: controller,
               connections: widget.connections,
+              theme: widget.connectionTheme ?? ConnectionCurveTheme.$default(),
               children: _children.entries
                   .sortedBy<num>(
                     (element) =>
@@ -186,12 +197,14 @@ class _GraphCanvasState extends State<GraphCanvas> {
 class GraphCanvasInternal extends MultiChildRenderObjectWidget {
   final GraphCanvasController controller;
   final List<Connection> connections;
+  final ConnectionCurveTheme<NodePort> theme;
 
   const GraphCanvasInternal({
     super.key,
     super.children,
     required this.controller,
     required this.connections,
+    required this.theme,
   });
 
   @override
@@ -219,7 +232,9 @@ class GraphCanvasInternal extends MultiChildRenderObjectWidget {
     return GraphCanvasInternalRenderObject()
       ..panOffset = controller.position
       ..scale = controller.scale
-      ..connections = connections;
+      ..connections = connections
+      ..context = context
+      ..theme = theme;
   }
 }
 
@@ -234,9 +249,11 @@ class GraphCanvasInternalElement extends MultiChildRenderObjectElement {
       super.renderObject as GraphCanvasInternalRenderObject;
 
   void updateRenderObject() {
+    renderObject.context = this;
     renderObject.panOffset = widget.controller.position;
     renderObject.scale = widget.controller.scale;
     renderObject.connections = widget.connections;
+    renderObject.theme = widget.theme;
   }
 
   @override
@@ -260,12 +277,16 @@ class GraphCanvasInternalRenderObject extends RenderBox
         RenderBoxContainerDefaultsMixin<RenderBox, StackParentData> {
   List<Connection> connections = [];
 
+  // Styling
+  late BuildContext context;
+  ConnectionCurveTheme theme = ConnectionCurveTheme.$default();
+
   // Transform state
   Offset _panOffset = Offset.zero;
   double _scale = 1.0;
 
   Map<String, Offset> portPositionCache = {};
-  Map<String, (Offset, GraphNodePortViewModel, RenderBox)> portCache = {};
+  Map<String, (Offset, NodePortWidgetMetadataValue, RenderBox)> portCache = {};
 
   Rect get viewBounds {
     return -(_panOffset / _scale) & (size / _scale);
@@ -316,7 +337,7 @@ class GraphCanvasInternalRenderObject extends RenderBox
       void visitor(RenderObject renderObject) {
         if (renderObject is RenderMetaData) {
           final meta = renderObject.metaData;
-          if (meta case GraphNodePortViewModel viewModel) {
+          if (meta case NodePortWidgetMetadataValue viewModel) {
             portCache[viewModel.port.id] = (
               childOffset,
               viewModel,
@@ -444,13 +465,18 @@ class GraphCanvasInternalRenderObject extends RenderBox
           transform: Matrix4.identity().scaled(_scale),
         ),
         (PaintingContext context, Offset offset) {
+          final decoration = theme.buildDecoration(
+            this.context,
+            startViewModel.port,
+            endViewModel.port,
+          );
+
           ConnectionCurve(
             start: start + offset,
             end: end + offset,
             startDirection: startViewModel.direction,
             endDirection: endViewModel.direction,
-            startColor: startViewModel.port.color ?? Colors.white,
-            endColor: endViewModel.port.color ?? Colors.white,
+            decoration: decoration,
           ).paint(context.canvas);
         },
         offset,

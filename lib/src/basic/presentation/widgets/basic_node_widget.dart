@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:graph_edit/src/domain/entity/node.dart';
-import 'package:graph_edit/src/presentation/widgets/graph_node_port_widget.dart';
+import 'package:graph_edit/src/basic/domain/entity/basic_node.dart';
+import 'package:graph_edit/src/basic/presentation/widgets/basic_node_port_widget.dart';
 
 final kGraphNodeDecoration = BoxDecoration(
   color: Colors.grey[800],
@@ -14,21 +14,21 @@ final kGraphNodeDecoration = BoxDecoration(
   ],
 );
 
-class GraphNodeWidget extends StatefulWidget {
-  final Node node;
+class BasicNodeWidget extends StatefulWidget {
+  final BasicNode node;
   final BoxDecoration? decoration;
 
-  const GraphNodeWidget({
+  const BasicNodeWidget({
     super.key,
     required this.node,
     this.decoration,
   });
 
   @override
-  GraphNodeWidgetState createState() => GraphNodeWidgetState();
+  BasicNodeWidgetState createState() => BasicNodeWidgetState();
 }
 
-class GraphNodeWidgetState extends State<GraphNodeWidget> {
+class BasicNodeWidgetState extends State<BasicNodeWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,8 +49,9 @@ class GraphNodeWidgetState extends State<GraphNodeWidget> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    for (final port in widget.node.inputs)
-                      GraphNodePortWidget(
+                    for (final port
+                        in widget.node.ports.where((port) => port.isInput))
+                      BasicNodePortWidget(
                         isInput: true,
                         port: port,
                       ),
@@ -60,8 +61,9 @@ class GraphNodeWidgetState extends State<GraphNodeWidget> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    for (final port in widget.node.outputs)
-                      GraphNodePortWidget(
+                    for (final port
+                        in widget.node.ports.where((port) => !port.isInput))
+                      BasicNodePortWidget(
                         isInput: false,
                         port: port,
                       ),

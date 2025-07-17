@@ -1,22 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:graph_edit/src/domain/entity/node_port.dart';
+import 'package:graph_edit/graph_edit.dart';
 
-class GraphNodePortViewModel extends ParentData {
-  final NodePort port;
-  final Offset direction;
-
-  GraphNodePortViewModel({
-    required this.port,
-    required this.direction,
-  });
-}
-
-class GraphNodePortWidget extends StatelessWidget {
-  final NodePort port;
+class BasicNodePortWidget extends StatelessWidget {
+  final BasicNodePort port;
   final bool isInput;
 
-  const GraphNodePortWidget({
+  const BasicNodePortWidget({
     super.key,
     required this.port,
     required this.isInput,
@@ -30,8 +19,8 @@ class GraphNodePortWidget extends StatelessWidget {
         children: [
           ...() {
             final widgets = [
-              MetaData(
-                metaData: GraphNodePortViewModel(
+              NodePortWidgetMetadata(
+                data: NodePortWidgetMetadataValue(
                   port: port,
                   direction: isInput ? Offset(-1, 0) : Offset(1, 0),
                 ),

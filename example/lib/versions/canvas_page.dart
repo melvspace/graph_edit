@@ -27,10 +27,10 @@ class _CanvasPageState extends State<CanvasPage> {
     RunMode.debug => 5000,
   };
 
-  late final Map<String, Node> nodes;
+  late final Map<String, BasicNode> nodes;
 
-  Map<String, Node> createInitialData() {
-    final map = <String, Node>{};
+  Map<String, BasicNode> createInitialData() {
+    final map = <String, BasicNode>{};
     for (final _ in List.generate(count, (index) => index)) {
       final node = generate(Size(bounds, bounds));
       map[node.id] = node;
@@ -50,7 +50,7 @@ class _CanvasPageState extends State<CanvasPage> {
     return Scaffold(
       appBar: AppBar(title: Text("Graph Canvas / V2")),
       drawer: context.watch<Drawer>(),
-      body: GraphCanvas(
+      body: BasicGraphCanvas(
         nodes: nodes.values.toList(),
         connections: [],
         onNodeDragged: (id, delta, zIndex) {
@@ -63,27 +63,25 @@ class _CanvasPageState extends State<CanvasPage> {
   }
 }
 
-Node generate(Size bounds) {
+BasicNode generate(Size bounds) {
   final random = Random();
   final position = Offset(
     (random.nextInt(bounds.width.toInt()) - bounds.width ~/ 2).toDouble(),
     (random.nextInt(bounds.height.toInt()) - bounds.height ~/ 2).toDouble(),
   );
 
-  return Node(
+  return BasicNode(
     id: Uuid().v4(),
     position: position,
     zIndex: 0,
     title:
         '(${position.dx.toInt()}, ${position.dy.toInt()}) '
         '${faker.lorem.words(random.nextInt(3) + 2).join(' ')}',
-    inputs: [
-      NodePort(id: Uuid().v4(), label: faker.lorem.word()),
-    ],
-    outputs: [
-      NodePort(id: Uuid().v4(), label: faker.lorem.word()),
-      NodePort(id: Uuid().v4(), label: faker.lorem.word()),
-      NodePort(id: Uuid().v4(), label: faker.lorem.word()),
+    ports: [
+      BasicNodePort(id: Uuid().v4(), isInput: true, label: faker.lorem.word()),
+      BasicNodePort(id: Uuid().v4(), isInput: false, label: faker.lorem.word()),
+      BasicNodePort(id: Uuid().v4(), isInput: false, label: faker.lorem.word()),
+      BasicNodePort(id: Uuid().v4(), isInput: false, label: faker.lorem.word()),
     ],
   );
 }

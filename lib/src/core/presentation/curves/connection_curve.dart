@@ -2,23 +2,23 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:graph_edit/src/core/presentation/theme/connection_curve_theme.dart';
 
 class ConnectionCurve {
   final Offset start;
   final Offset startDirection;
-  final Color startColor;
 
   final Offset end;
   final Offset endDirection;
-  final Color endColor;
+
+  final ConnectionCurveDecoration decoration;
 
   ConnectionCurve({
     required this.start,
     required this.end,
     required this.startDirection,
     required this.endDirection,
-    required this.startColor,
-    required this.endColor,
+    required this.decoration,
   });
 
   void paint(Canvas canvas) {
@@ -52,9 +52,9 @@ class ConnectionCurve {
       path,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2
+        ..strokeWidth = decoration.strokeWidth
         ..shader = LinearGradient(
-          colors: [startColor, endColor],
+          colors: [decoration.startColor, decoration.endColor],
           begin: gradientBegin,
           end: gradientEnd,
         ).createShader(pathBounds),

@@ -11,33 +11,49 @@ class ConnectionsPage extends StatefulWidget {
 }
 
 class _ConnectionsPageState extends State<ConnectionsPage> {
-  final nodes = Map.fromEntries(
+  final Map<String, BasicNode> nodes = Map.fromEntries(
     [
-      Node(
+      BasicNode(
         id: '1',
         position: Offset.zero,
         title: '',
-        inputs: [
-          NodePort(id: '1', label: 'In 1', color: Colors.red),
-          NodePort(id: '2', label: 'In 2', color: Colors.yellow),
-        ],
-        outputs: [
-          NodePort(id: '3', label: 'Out 1', color: Colors.blue),
-          NodePort(id: '4', label: 'Out 2', color: Colors.green),
+        ports: [
+          BasicNodePort(
+            id: '1',
+            isInput: true,
+            label: 'In 1',
+            color: Colors.red,
+          ),
+          BasicNodePort(
+            id: '2',
+            isInput: true,
+            label: 'In 2',
+            color: Colors.yellow,
+          ),
+          BasicNodePort(
+            id: '3',
+            isInput: false,
+            label: 'Out 1',
+            color: Colors.blue,
+          ),
+          BasicNodePort(
+            id: '4',
+            isInput: false,
+            label: 'Out 2',
+            color: Colors.green,
+          ),
         ],
         zIndex: 0,
       ),
-      Node(
+      BasicNode(
         id: '2',
         position: Offset(100, 100),
         title: '',
-        inputs: [
-          NodePort(id: '5', label: 'In 1'),
-          NodePort(id: '6', label: 'In 2'),
-        ],
-        outputs: [
-          NodePort(id: '7', label: 'Out 1'),
-          NodePort(id: '8', label: 'Out 2'),
+        ports: [
+          BasicNodePort(id: '5', isInput: true, label: 'In 1'),
+          BasicNodePort(id: '6', isInput: true, label: 'In 2'),
+          BasicNodePort(id: '7', isInput: false, label: 'Out 1'),
+          BasicNodePort(id: '8', isInput: false, label: 'Out 2'),
         ],
         zIndex: 0,
       ),
@@ -59,7 +75,7 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
         body: Row(
           children: [
             Expanded(
-              child: GraphCanvas(
+              child: BasicGraphCanvas(
                 nodes: nodes.values.toList(),
                 selected: selected,
                 onNodeDragged: (id, position, zIndex) => setState(() {
@@ -76,7 +92,7 @@ class _ConnectionsPageState extends State<ConnectionsPage> {
                 ],
                 nodeBuilder: (node, selected) => GestureDetector(
                   onTap: () => this.selected = node.id,
-                  child: GraphNodeWidget(
+                  child: BasicNodeWidget(
                     node: node,
                     decoration: selected
                         ? kGraphNodeDecoration.copyWith(
